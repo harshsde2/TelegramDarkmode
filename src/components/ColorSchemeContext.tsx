@@ -107,7 +107,7 @@ export const useColorScheme = () => {
       overlay1,
       overlay2,
     });
-    const duration = 1000;
+    const duration = 800;
     transition.value = 0;
     transition.value = withTiming(1, { duration });
 
