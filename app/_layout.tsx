@@ -1,40 +1,55 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import { ThemeProvider } from "@shopify/restyle";
+import { useFonts } from "expo-font";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import type { Routes } from "../src/Routes";
+import {
+  ColorSchemeProvider,
+  LoadAssets,
+  darkTheme,
+  theme,
+  useColorScheme,
+} from "../src/components";
+import { Telegram } from "../src/Telegram";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
+const fonts = {};
+const assets: number[] = [];
+const Stack = createStackNavigator<Routes>();
+const AppNavigator = () => {
+  const { colorScheme } = useColorScheme();
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
+    <ThemeProvider theme={colorScheme === "dark" ? darkTheme : theme}>
+      <Stack.Navigator>
+        <Stack.Group>
+          <Stack.Screen
+            name="Telegram"
+            component={Telegram}
+            options={{
+              title: "💬 Telegram",
+              headerShown: false,
+            }}
+          />
+        </Stack.Group>
+      </Stack.Navigator>
     </ThemeProvider>
   );
-}
+};
+
+const App = () => {
+  const [fontsLoaded] = useFonts({
+    SFProDisplayBold: require("../assets/fonts/SF-Pro-Display-Bold.otf"),
+    SFProTextRegular: require("../assets/fonts/SF-Pro-Text-Regular.otf"),
+  });
+  if (!fontsLoaded) {
+    return null;
+  }
+  return (
+    <ColorSchemeProvider>
+      <AppNavigator />
+    </ColorSchemeProvider>
+  );
+};
+
+// eslint-disable-next-line import/no-default-export
+export default App;
